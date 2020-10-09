@@ -4,15 +4,15 @@ import 'package:flutter_app_sample/model/contact_model.dart';
 
 abstract class FirebaseService {
   bool loadedAll = false;
-  Future<List<ContactsModel>> getContacts(int limit, int pageNumber);
+  Future getContacts(int limit, int pageNumber);
 }
 
 class FirebaseServiceImpl extends FirebaseService {
   DocumentSnapshot lastDocument;
 
-  //
+  /// Fetch and cache a list of [limit] contact starting at [page]
   @override
-  Future<List<ContactsModel>> getContacts(int limit, int pageNumber) async {
+  Future getContacts(int limit, int pageNumber) async {
     List<ContactsModel> contacts = [];
     QuerySnapshot qs;
     try {

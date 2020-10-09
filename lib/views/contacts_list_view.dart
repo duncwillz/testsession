@@ -58,7 +58,6 @@ class _ContactListViewState extends State<ContactListView> {
               );
             }),
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
-              bool isLoadingContacts = state is LoadingContacts;
               return Column(
                 children: <Widget>[
                   if (contacts.isNotEmpty && state is LoadingContacts)
@@ -68,14 +67,6 @@ class _ContactListViewState extends State<ContactListView> {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  if (!isLoadingContacts && contactBloc.loadedAll) ...[
-                    Center(
-                      child: FlutterLogo(),
-                    ),
-                    SizedBox(
-                      height: 30,
-                    )
-                  ]
                 ],
               );
             }),
@@ -86,30 +77,58 @@ class _ContactListViewState extends State<ContactListView> {
   }
 
   Widget content({ContactsState state}) {
-    return state is LoadingContacts && contacts.isEmpty && state is LoadingError
+    return state is LoadingContacts && contacts.isEmpty
         ? Center(
             child: CircularProgressIndicator(),
           )
         : state is ContactsLoaded
             ? ListView.builder(
-                itemCount: contacts.length,
+                itemCount: contacts.length + 1,
                 itemBuilder: (context, itemIndex) {
-                  ContactsModel contact = contacts[itemIndex];
-                  return ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
-                        child: CircleAvatar(
-                          radius: 20,
-                          child: contact.avatarUrl == ""
-                              ? Image.asset("assets/img/avatar.png")
-                              : Image.network(contact.avatarUrl),
+                  bool isLoadingContacts = state is LoadingContacts;
+                  if (itemIndex == contacts.length + 1) {
+                    if (contactBloc.loadedAll) {
+                      return FlutterLogo();
+                    }
+                    return Container();
+                  } else {
+                    ContactsModel contact = contacts[itemIndex];
+                    return ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          child: CircleAvatar(
+                            radius: 20,
+                            child: contact.avatarUrl == ""
+                                ? Image.asset(
+                                    "assets/img/avatar.jpeg",
+                                    fit: BoxFit.fill,
+                                  )
+                                : Image.network(contact.avatarUrl),
+                          ),
                         ),
-                      ),
-                      title: Text(contact.name),
-                      subtitle: Text(contact.email));
+                        title: Text(contact.name),
+                        subtitle: Text(contact.email));
+                  }
                 })
             : state is LoadingError
-                ? Container(child: Center(child: Text(state.message)))
+                ? Container(
+                    child: Center(
+                        child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        state.message,
+                        style: TextStyle(color: Colors.red),
+                      ),
+                      FlatButton(
+                          onPressed: () {
+                            contactBloc.loadContact(
+                                limit: limit, pageNumber: 1);
+                          },
+                          child: Text("Retry"))
+                    ],
+                  )))
                 : SizedBox();
   }
 }
