@@ -10,7 +10,7 @@ class ContactListView extends StatefulWidget {
 
 class _ContactListViewState extends State<ContactListView> {
   List<ContactsModel> contacts = [];
-  int limit = 3;
+  int limit = 15;
   @override
   void initState() {
     contactBloc.loadContact(limit: limit, pageNumber: 1);
@@ -39,22 +39,23 @@ class _ContactListViewState extends State<ContactListView> {
             Expanded(
               child: NotificationListener(
                   onNotification: (ScrollNotification scrollInfo) {
-                if (contacts.isNotEmpty &&
-                    scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent &&
-                    !contactBloc.loadedAll) {
-                  int pageNumber = ((contacts.length / limit).truncate());
-                  contactBloc.loadContact(
-                      limit: limit, pageNumber: ++pageNumber);
-                }
-                return true;
-              }, child: BlocBuilder<ContactBloc, ContactsState>(
+                    if (contacts.isNotEmpty &&
+                        scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent &&
+                        !contactBloc.loadedAll) {
+                      contactBloc.loadContact(
+                          limit: limit, pageNumber: ++pageNumber);
+                    }
+                    return true;
+                  },
+                  child: BlocBuilder<ContactBloc, ContactsState>(
+                      condition: (_, state) => state is ContactsLoaded,
                       builder: (context, state) {
-                if (state is ContactsLoaded) {
-                  contacts = state.contacts;
-                }
-                return content(state: state);
-              })),
+                        if (state is ContactsLoaded) {
+                          contacts = state.contacts;
+                        }
+                        return content(state: state);
+                      })),
             ),
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
               return Column(
@@ -83,7 +84,10 @@ class _ContactListViewState extends State<ContactListView> {
     );
   }
 
+  int pageNumber = 1;
+
   Widget content({ContactsState state}) {
+    print("Build ${contacts.length} contacts");
     return state is LoadingContacts && contacts.isEmpty
         ? Center(
             child: CircularProgressIndicator(),
@@ -102,6 +106,7 @@ class _ContactListViewState extends State<ContactListView> {
                     return Container();
                   } else if (itemIndex < contacts.length) {
                     ContactsModel contact = contacts[itemIndex];
+
                     return ListTile(
                         leading: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(30)),

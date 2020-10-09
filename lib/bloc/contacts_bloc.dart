@@ -27,10 +27,7 @@ class ContactBloc extends Bloc<ContactEvent, ContactsState> {
     if (event is LoadContacts) {
       yield LoadingContacts();
       try {
-        await Future.delayed(Duration(seconds: 1), () async {
-          await firebaseService.getContacts(event.limit, event.pageNumber);
-        });
-
+        await firebaseService.getContacts(event.limit, event.pageNumber);
         yield ContactsLoaded(contacts: cacheData.values.toList());
       } on ServiceException {
         yield LoadingError(message: "Error loading from firebase");

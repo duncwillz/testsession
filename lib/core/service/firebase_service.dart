@@ -15,38 +15,41 @@ class FirebaseServiceImpl extends FirebaseService {
   Future getContacts(int limit, int pageNumber) async {
     List<ContactsModel> contacts = [];
     QuerySnapshot qs;
-    try {
-      if (pageNumber == 1) {
-        qs = await Firestore.instance
-            .collection("contacts")
-            .orderBy("name")
-            .limit(limit)
-            .getDocuments();
-        lastDocument = qs.documents.last;
-      } else {
-        qs = await Firestore.instance
-            .collection("contacts")
-            .orderBy("name")
-            .startAfterDocument(lastDocument)
-            .limit(limit)
-            .getDocuments();
-        if (qs.documents.isNotEmpty) {
+    await Future.delayed(Duration(seconds: 2), () async {
+      try {
+        if (pageNumber == 1) {
+          qs = await Firestore.instance
+              .collection("contacts")
+              .orderBy("name")
+              .limit(limit)
+              .getDocuments();
           lastDocument = qs.documents.last;
+        } else {
+          qs = await Firestore.instance
+              .collection("contacts")
+              .orderBy("name")
+              .startAfterDocument(lastDocument)
+              .limit(limit)
+              .getDocuments();
+          if (qs.documents.isNotEmpty) {
+            lastDocument = qs.documents.last;
+          }
         }
+        if (qs != null && qs.documents.isNotEmpty) {
+          qs.documents
+              .forEach((doc) => contacts.add(ContactsModel.fromJson(doc.data)));
+        }
+      } catch (e) {
+        throw ServiceException(exceptionMessage: e);
       }
-      if (qs != null && qs.documents.isNotEmpty) {
-        qs.documents
-            .forEach((doc) => contacts.add(ContactsModel.fromJson(doc.data)));
+      if (contacts.length < limit || contacts.length == 0) {
+        loadedAll = true;
       }
-    } catch (e) {
-      throw ServiceException(exceptionMessage: e);
-    }
-    if (contacts.length < limit || contacts.length == 0) {
-      loadedAll = true;
-    }
-    var mapData = Map<String, ContactsModel>.fromIterable(contacts,
-        key: (c) => c.email, value: (c) => c);
-    cacheData.addAll(mapData);
+      var mapData = Map<String, ContactsModel>.fromIterable(contacts,
+          key: (c) => c.email, value: (c) => c);
+
+      cacheData.addAll(mapData);
+    });
   }
 }
 
