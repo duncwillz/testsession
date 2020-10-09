@@ -11,9 +11,12 @@ class ContactListView extends StatefulWidget {
 class _ContactListViewState extends State<ContactListView> {
   List<ContactsModel> contacts = [];
   int limit = 15;
+  int pageNumber = 1;
+
   @override
   void initState() {
-    contactBloc.loadContact(limit: limit, pageNumber: 1);
+    // Load 1st page first
+    contactBloc.loadContact(limit: limit, pageNumber: pageNumber);
     super.initState();
   }
 
@@ -39,6 +42,8 @@ class _ContactListViewState extends State<ContactListView> {
             Expanded(
               child: NotificationListener(
                   onNotification: (ScrollNotification scrollInfo) {
+                    // Load next page when scrolled to bottom and if there are
+                    // more contacts to fetch.
                     if (contacts.isNotEmpty &&
                         scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent &&
@@ -48,6 +53,8 @@ class _ContactListViewState extends State<ContactListView> {
                     }
                     return true;
                   },
+
+                  // Contact List
                   child: BlocBuilder<ContactBloc, ContactsState>(
                       condition: (_, state) => state is ContactsLoaded,
                       builder: (context, state) {
@@ -57,6 +64,8 @@ class _ContactListViewState extends State<ContactListView> {
                         return content(state: state);
                       })),
             ),
+
+            // Loading more indicator
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
               return Column(
                 children: <Widget>[
@@ -84,15 +93,15 @@ class _ContactListViewState extends State<ContactListView> {
     );
   }
 
-  int pageNumber = 1;
-
   Widget content({ContactsState state}) {
-    print("Build ${contacts.length} contacts");
     return state is LoadingContacts && contacts.isEmpty
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : state is ContactsLoaded || contacts.isNotEmpty
+        ?
+        // Empty, loading state
+        Center(child: CircularProgressIndicator())
+        :
+
+        // Loaded State
+        state is ContactsLoaded || contacts.isNotEmpty
             ? ListView.builder(
                 itemCount: contacts.length + 1,
                 itemBuilder: (context, itemIndex) {
@@ -125,6 +134,8 @@ class _ContactListViewState extends State<ContactListView> {
                   }
                   return Container();
                 })
+
+            // Error State
             : state is LoadingError
                 ? Container(
                     child: Center(
