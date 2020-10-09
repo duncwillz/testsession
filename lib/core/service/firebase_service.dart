@@ -30,7 +30,9 @@ class FirebaseServiceImpl extends FirebaseService {
             .startAfterDocument(lastDocument)
             .limit(limit)
             .getDocuments();
-        lastDocument = qs.documents.last;
+        if (qs.documents.isNotEmpty) {
+          lastDocument = qs.documents.last;
+        }
       }
       if (qs != null && qs.documents.isNotEmpty) {
         qs.documents

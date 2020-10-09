@@ -36,35 +36,42 @@ class _ContactListViewState extends State<ContactListView> {
                 textAlign: TextAlign.left,
               ),
             ),
-            BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
-              if (state is ContactsLoaded) {
-                contacts = state.contacts;
-              }
-              return Expanded(
-                child: NotificationListener(
-                    onNotification: (ScrollNotification scrollInfo) {
-                      if (state is ContactsLoaded &&
-                          contacts.isNotEmpty &&
-                          scrollInfo.metrics.pixels ==
-                              scrollInfo.metrics.maxScrollExtent &&
-                          !contactBloc.loadedAll) {
-                        int pageNumber = ((contacts.length / limit).truncate());
-                        contactBloc.loadContact(
-                            limit: limit, pageNumber: ++pageNumber);
-                      }
-                      return true;
-                    },
-                    child: content(state: state)),
-              );
-            }),
+            Expanded(
+              child: NotificationListener(
+                  onNotification: (ScrollNotification scrollInfo) {
+                if (contacts.isNotEmpty &&
+                    scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent &&
+                    !contactBloc.loadedAll) {
+                  int pageNumber = ((contacts.length / limit).truncate());
+                  contactBloc.loadContact(
+                      limit: limit, pageNumber: ++pageNumber);
+                }
+                return true;
+              }, child: BlocBuilder<ContactBloc, ContactsState>(
+                      builder: (context, state) {
+                if (state is ContactsLoaded) {
+                  contacts = state.contacts;
+                }
+                return content(state: state);
+              })),
+            ),
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
               return Column(
                 children: <Widget>[
                   if (contacts.isNotEmpty && state is LoadingContacts)
-                    Container(
-                      height: 40,
-                      child: Center(
-                        child: CircularProgressIndicator(),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Container(
+                        height: 40,
+                        child: Center(
+                          child: SizedBox(
+                              width: 15,
+                              height: 15,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              )),
+                        ),
                       ),
                     ),
                 ],
@@ -81,17 +88,19 @@ class _ContactListViewState extends State<ContactListView> {
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : state is ContactsLoaded
+        : state is ContactsLoaded || contacts.isNotEmpty
             ? ListView.builder(
                 itemCount: contacts.length + 1,
                 itemBuilder: (context, itemIndex) {
                   bool isLoadingContacts = state is LoadingContacts;
-                  if (itemIndex == contacts.length + 1) {
+                  if (itemIndex == contacts.length) {
                     if (contactBloc.loadedAll) {
-                      return FlutterLogo();
+                      return Padding(
+                          padding: EdgeInsets.only(bottom: 20),
+                          child: FlutterLogo());
                     }
                     return Container();
-                  } else {
+                  } else if (itemIndex < contacts.length) {
                     ContactsModel contact = contacts[itemIndex];
                     return ListTile(
                         leading: ClipRRect(
@@ -109,6 +118,7 @@ class _ContactListViewState extends State<ContactListView> {
                         title: Text(contact.name),
                         subtitle: Text(contact.email));
                   }
+                  return Container();
                 })
             : state is LoadingError
                 ? Container(
@@ -123,6 +133,7 @@ class _ContactListViewState extends State<ContactListView> {
                       ),
                       FlatButton(
                           onPressed: () {
+                            contacts = [];
                             contactBloc.loadContact(
                                 limit: limit, pageNumber: 1);
                           },
