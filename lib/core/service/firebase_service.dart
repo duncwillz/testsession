@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_app_sample/core/persistance/local_cache.dart';
 import 'package:flutter_app_sample/model/contact_model.dart';
+import 'package:flutter_app_sample/util/string_types.dart';
 
 abstract class FirebaseService {
   bool loadedAll = false;
@@ -20,15 +21,15 @@ class FirebaseServiceImpl extends FirebaseService {
       try {
         if (pageNumber == 1) {
           qs = await Firestore.instance
-              .collection("contacts")
-              .orderBy("name")
+              .collection(StringType.collectionName)
+              .orderBy(StringType.fieldName)
               .limit(limit)
               .getDocuments();
           lastDocument = qs.documents.last;
         } else {
           qs = await Firestore.instance
               .collection("contacts")
-              .orderBy("name")
+              .orderBy(StringType.fieldName)
               .startAfterDocument(lastDocument)
               .limit(limit)
               .getDocuments();

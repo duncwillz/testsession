@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_sample/bloc/contacts_bloc.dart';
 import 'package:flutter_app_sample/model/contact_model.dart';
+import 'package:flutter_app_sample/util/string_types.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ContactListView extends StatefulWidget {
@@ -123,7 +124,7 @@ class _ContactListViewState extends State<ContactListView> {
                             radius: 20,
                             child: contact.avatarUrl == ""
                                 ? Image.asset(
-                                    "assets/img/avatar.jpeg",
+                                    AssetPath.defaultAvatar,
                                     fit: BoxFit.fill,
                                   )
                                 : Image.network(contact.avatarUrl),
