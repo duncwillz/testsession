@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app_sample/bloc/contacts_bloc.dart';
+import 'package:flutter_app_sample/model/contact_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'bloc/contacts_bloc.dart';
-import 'model/contact_model.dart';
 
 class ContactListView extends StatefulWidget {
   @override
@@ -55,36 +54,7 @@ class _ContactListViewState extends State<ContactListView> {
                       }
                       return true;
                     },
-                    child: state is LoadingContacts &&
-                            contacts.isEmpty &&
-                            state is LoadingError
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : state is ContactsLoaded
-                            ? ListView.builder(
-                                itemCount: contacts.length,
-                                itemBuilder: (context, itemIndex) {
-                                  ContactsModel contact = contacts[itemIndex];
-                                  return ListTile(
-                                      leading: ClipRRect(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(30)),
-                                        child: CircleAvatar(
-                                          radius: 20,
-                                          child: contact.avatarUrl == ""
-                                              ? FlutterLogo()
-                                              : Image.network(
-                                                  contact.avatarUrl),
-                                        ),
-                                      ),
-                                      title: Text(contact.name),
-                                      subtitle: Text(contact.email));
-                                })
-                            : state is LoadingError
-                                ? Container(
-                                    child: Center(child: Text(state.message)))
-                                : SizedBox()),
+                    child: content(state: state)),
               );
             }),
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
@@ -113,5 +83,33 @@ class _ContactListViewState extends State<ContactListView> {
         ),
       ),
     );
+  }
+
+  Widget content({ContactsState state}) {
+    return state is LoadingContacts && contacts.isEmpty && state is LoadingError
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : state is ContactsLoaded
+            ? ListView.builder(
+                itemCount: contacts.length,
+                itemBuilder: (context, itemIndex) {
+                  ContactsModel contact = contacts[itemIndex];
+                  return ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        child: CircleAvatar(
+                          radius: 20,
+                          child: contact.avatarUrl == ""
+                              ? Image.asset("assets/img/avatar.png")
+                              : Image.network(contact.avatarUrl),
+                        ),
+                      ),
+                      title: Text(contact.name),
+                      subtitle: Text(contact.email));
+                })
+            : state is LoadingError
+                ? Container(child: Center(child: Text(state.message)))
+                : SizedBox();
   }
 }

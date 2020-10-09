@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app_sample/core/service/firebase_service.dart';
-import 'package:flutter_app_sample/views.dart';
+import 'package:flutter_app_sample/views/contacts_list_view.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'bloc/contacts_bloc.dart';
