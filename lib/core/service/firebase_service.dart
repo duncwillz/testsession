@@ -15,30 +15,30 @@ class FirebaseServiceImpl extends FirebaseService {
   @override
   Future getContacts(int limit, int pageNumber) async {
     List<ContactsModel> contacts = [];
-    QuerySnapshot qs;
+    QuerySnapshot querySnapshot;
     await Future.delayed(Duration(seconds: 2), () async {
       // Future.Delayed to simulate network delay
       try {
         if (pageNumber == 1) {
-          qs = await Firestore.instance
+          querySnapshot = await Firestore.instance
               .collection(StringType.collectionName)
               .orderBy(StringType.fieldName)
               .limit(limit)
               .getDocuments();
-          lastDocument = qs.documents.last;
+          lastDocument = querySnapshot.documents.last;
         } else {
-          qs = await Firestore.instance
+          querySnapshot = await Firestore.instance
               .collection(StringType.collectionName)
               .orderBy(StringType.fieldName)
               .startAfterDocument(lastDocument)
               .limit(limit)
               .getDocuments();
-          if (qs.documents.isNotEmpty) {
-            lastDocument = qs.documents.last;
+          if (querySnapshot.documents.isNotEmpty) {
+            lastDocument = querySnapshot.documents.last;
           }
         }
-        if (qs != null && qs.documents.isNotEmpty) {
-          qs.documents
+        if (querySnapshot != null && querySnapshot.documents.isNotEmpty) {
+          querySnapshot.documents
               .forEach((doc) => contacts.add(ContactsModel.fromJson(doc.data)));
         }
       } catch (e) {
@@ -52,7 +52,7 @@ class FirebaseServiceImpl extends FirebaseService {
         loadedAll = true;
       }
       var mapData = Map<String, ContactsModel>.fromIterable(contacts,
-          key: (c) => c.email, value: (c) => c);
+          key: (contact) => contact.email, value: (contact) => contact);
 
       // Cache data. Bloc reads directly from cache, passes this to UI
       cacheData.addAll(mapData);

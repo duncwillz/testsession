@@ -11,13 +11,13 @@ class ContactListView extends StatefulWidget {
 
 class _ContactListViewState extends State<ContactListView> {
   List<ContactsModel> contacts = [];
-  int limit = 15;
+  int fetchLimit = 15;
   int pageNumber = 1;
 
   @override
   void initState() {
     // Load 1st page first
-    contactBloc.loadContact(limit: limit, pageNumber: pageNumber);
+    contactBloc.loadContact(limit: fetchLimit, pageNumber: pageNumber);
     super.initState();
   }
 
@@ -50,7 +50,7 @@ class _ContactListViewState extends State<ContactListView> {
                             scrollInfo.metrics.maxScrollExtent &&
                         !contactBloc.loadedAll) {
                       contactBloc.loadContact(
-                          limit: limit, pageNumber: ++pageNumber);
+                          limit: fetchLimit, pageNumber: ++pageNumber);
                     }
                     return true;
                   },
@@ -152,7 +152,7 @@ class _ContactListViewState extends State<ContactListView> {
                           onPressed: () {
                             contacts = [];
                             contactBloc.loadContact(
-                                limit: limit, pageNumber: 1);
+                                limit: fetchLimit, pageNumber: 1);
                           },
                           child: Text("Retry"))
                     ],
