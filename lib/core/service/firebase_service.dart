@@ -28,7 +28,7 @@ class FirebaseServiceImpl extends FirebaseService {
           lastDocument = qs.documents.last;
         } else {
           qs = await Firestore.instance
-              .collection("contacts")
+              .collection(StringType.collectionName)
               .orderBy(StringType.fieldName)
               .startAfterDocument(lastDocument)
               .limit(limit)

@@ -54,11 +54,6 @@ class LoadingError extends ContactsState {
 
 class LoadedAllContacts extends ContactsState {}
 
-class HasLoadedContacts extends ContactEvent {
-  List<ContactsModel> contacts;
-  HasLoadedContacts({this.contacts});
-}
-
 class LoadContacts extends ContactEvent {
   int pageNumber, limit;
   LoadContacts({this.limit, this.pageNumber});
