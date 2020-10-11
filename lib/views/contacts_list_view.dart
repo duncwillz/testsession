@@ -35,6 +35,8 @@ class _ContactListViewState extends State<ContactListView> {
               padding: const EdgeInsets.only(left: 20.0, top: 20),
               child: Text(
                 "All Contacts",
+                style: TextStyle(
+                    fontSize: 20, color: Colors.black.withOpacity(0.5)),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -104,37 +106,56 @@ class _ContactListViewState extends State<ContactListView> {
 
         // Loaded State
         state is ContactsLoaded || contacts.isNotEmpty
-            ? ListView.builder(
-                itemCount: contacts.length + 1,
-                itemBuilder: (context, itemIndex) {
-                  bool isLoadingContacts = state is LoadingContacts;
-                  if (itemIndex == contacts.length) {
-                    if (contactBloc.loadedAll) {
-                      return Padding(
-                          padding: EdgeInsets.only(bottom: 20),
-                          child: FlutterLogo());
+            ? Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView.separated(
+                  itemCount: contacts.length + 1,
+                  itemBuilder: (context, itemIndex) {
+                    bool isLoadingContacts = state is LoadingContacts;
+                    if (itemIndex == contacts.length) {
+                      if (contactBloc.loadedAll) {
+                        return Padding(
+                            padding: EdgeInsets.only(bottom: 20, top: 20),
+                            child: FlutterLogo(
+                              size: 50,
+                            ));
+                      }
+                      return Container();
+                    } else if (itemIndex < contacts.length) {
+                      ContactsModel contact = contacts[itemIndex];
+
+                      return ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundImage: contact.avatarUrl == ""
+                                  ? AssetImage(
+                                      AssetPath.defaultAvatar,
+                                    )
+                                  : NetworkImage(contact.avatarUrl),
+                            ),
+                          ),
+                          title: Text(
+                            contact.name,
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w500),
+                          ),
+                          subtitle: Text(
+                            contact.email,
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w400),
+                          ));
                     }
                     return Container();
-                  } else if (itemIndex < contacts.length) {
-                    ContactsModel contact = contacts[itemIndex];
-
-                    return ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundImage: contact.avatarUrl == ""
-                                ? AssetImage(
-                                    AssetPath.defaultAvatar,
-                                  )
-                                : NetworkImage(contact.avatarUrl),
-                          ),
-                        ),
-                        title: Text(contact.name),
-                        subtitle: Text(contact.email));
-                  }
-                  return Container();
-                })
+                  },
+                  separatorBuilder: (context, itemIndex) {
+                    return Divider(
+                      height: 1,
+                    );
+                  },
+                ),
+              )
 
             // Error State
             : state is LoadingError

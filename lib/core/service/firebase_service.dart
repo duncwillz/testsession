@@ -17,7 +17,7 @@ class FirebaseServiceImpl extends FirebaseService {
   Future getContacts(int fetchLimit, int pageNumber) async {
     List<ContactsModel> contacts = [];
     QuerySnapshot querySnapshot;
-    await Future.delayed(Duration(seconds: 2), () async {
+    await Future.delayed(Duration(seconds: 1), () async {
       // Future.Delayed to simulate network delay
       try {
         if (pageNumber == 1) {
