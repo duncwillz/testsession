@@ -11,10 +11,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ContactBloc extends Bloc<ContactEvent, ContactsState> {
   FirebaseService firebaseService;
 
+  //Set the fetch limit to preference
+  final int fetchLimit = 10;
+  int initialPageNumber = 1;
+
   ContactBloc({this.firebaseService});
 
-  void loadContact({int limit, int pageNumber}) {
-    add(LoadContacts(limit: limit, pageNumber: pageNumber));
+  void loadContact({int pageNumber}) {
+    add(LoadContacts(
+        limit: fetchLimit, pageNumber: pageNumber ?? initialPageNumber));
   }
 
   bool get loadedAll => firebaseService.loadedAll;

@@ -5,15 +5,15 @@ import 'package:flutter_app_sample/util/string_types.dart';
 
 abstract class FirebaseService {
   bool loadedAll = false;
-  Future getContacts(int limit, int pageNumber);
+  Future getContacts(int fetchLimit, int pageNumber);
 }
 
 class FirebaseServiceImpl extends FirebaseService {
   DocumentSnapshot lastDocument;
 
-  /// Fetch and cache a list of [limit] contacts starting at page number [page]
+  /// Fetch and cache a list of [fetchLimit] contacts starting at page number [pageNumber]
   @override
-  Future getContacts(int limit, int pageNumber) async {
+  Future getContacts(int fetchLimit, int pageNumber) async {
     List<ContactsModel> contacts = [];
     QuerySnapshot querySnapshot;
     await Future.delayed(Duration(seconds: 2), () async {
@@ -23,7 +23,7 @@ class FirebaseServiceImpl extends FirebaseService {
           querySnapshot = await Firestore.instance
               .collection(StringType.collectionName)
               .orderBy(StringType.fieldName)
-              .limit(limit)
+              .limit(fetchLimit)
               .getDocuments();
           lastDocument = querySnapshot.documents.last;
         } else {
@@ -31,7 +31,7 @@ class FirebaseServiceImpl extends FirebaseService {
               .collection(StringType.collectionName)
               .orderBy(StringType.fieldName)
               .startAfterDocument(lastDocument)
-              .limit(limit)
+              .limit(fetchLimit)
               .getDocuments();
           if (querySnapshot.documents.isNotEmpty) {
             lastDocument = querySnapshot.documents.last;
@@ -48,7 +48,7 @@ class FirebaseServiceImpl extends FirebaseService {
       // Set loadedAll flag for when all contacts are loaded
       //  Any page that loads less than the limit is the last page
       // (Or 0 meaning the previous fully filled page was the last)
-      if (contacts.length < limit || contacts.length == 0) {
+      if (contacts.length < fetchLimit || contacts.length == 0) {
         loadedAll = true;
       }
       var mapData = Map<String, ContactsModel>.fromIterable(contacts,
