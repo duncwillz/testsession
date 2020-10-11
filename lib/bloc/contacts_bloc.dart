@@ -11,6 +11,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ContactBloc extends Bloc<ContactEvent, ContactsState> {
   FirebaseService firebaseService;
 
+  List<ContactsModel> contacts = [];
+
   //Set the fetch limit to preference
   final int fetchLimit = 10;
   int initialPageNumber = 1;

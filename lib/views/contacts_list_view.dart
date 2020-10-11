@@ -10,8 +10,6 @@ class ContactListView extends StatefulWidget {
 }
 
 class _ContactListViewState extends State<ContactListView> {
-  List<ContactsModel> contacts = [];
-
   @override
   void initState() {
     // Load 1st page first
@@ -45,7 +43,7 @@ class _ContactListViewState extends State<ContactListView> {
                   onNotification: (ScrollNotification scrollInfo) {
                     // Load next page when scrolled to bottom and if there are
                     // more contacts to fetch.
-                    if (contacts.isNotEmpty &&
+                    if (contactBloc.contacts.isNotEmpty &&
                         scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent &&
                         !contactBloc.loadedAll &&
@@ -62,7 +60,7 @@ class _ContactListViewState extends State<ContactListView> {
                       condition: (_, state) => state is ContactsLoaded,
                       builder: (context, state) {
                         if (state is ContactsLoaded) {
-                          contacts = state.contacts;
+                          contactBloc.contacts = state.contacts;
                           contactBloc.isLoadingMore = false;
                         }
                         return content(state: state);
@@ -73,11 +71,12 @@ class _ContactListViewState extends State<ContactListView> {
             BlocBuilder<ContactBloc, ContactsState>(builder: (context, state) {
               return Column(
                 children: <Widget>[
-                  if (contacts.isNotEmpty && state is LoadingContacts)
+                  if (contactBloc.contacts.isNotEmpty &&
+                      state is LoadingContacts)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 20),
                       child: Container(
-                        height: 40,
+                        height: 20,
                         child: Center(
                           child: SizedBox(
                               width: 15,
@@ -98,21 +97,21 @@ class _ContactListViewState extends State<ContactListView> {
   }
 
   Widget content({ContactsState state}) {
-    return state is LoadingContacts && contacts.isEmpty
+    return state is LoadingContacts && contactBloc.contacts.isEmpty
         ?
         // Empty, loading state
         Center(child: CircularProgressIndicator())
         :
 
         // Loaded State
-        state is ContactsLoaded || contacts.isNotEmpty
+        state is ContactsLoaded || contactBloc.contacts.isNotEmpty
             ? Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ListView.separated(
-                  itemCount: contacts.length + 1,
+                  itemCount: contactBloc.contacts.length + 1,
                   itemBuilder: (context, itemIndex) {
                     bool isLoadingContacts = state is LoadingContacts;
-                    if (itemIndex == contacts.length) {
+                    if (itemIndex == contactBloc.contacts.length) {
                       if (contactBloc.loadedAll) {
                         return Padding(
                             padding: EdgeInsets.only(bottom: 20, top: 20),
@@ -121,8 +120,8 @@ class _ContactListViewState extends State<ContactListView> {
                             ));
                       }
                       return Container();
-                    } else if (itemIndex < contacts.length) {
-                      ContactsModel contact = contacts[itemIndex];
+                    } else if (itemIndex < contactBloc.contacts.length) {
+                      ContactsModel contact = contactBloc.contacts[itemIndex];
 
                       return ListTile(
                           leading: ClipRRect(
@@ -171,7 +170,7 @@ class _ContactListViewState extends State<ContactListView> {
                       ),
                       FlatButton(
                           onPressed: () {
-                            contacts = [];
+                            contactBloc.contacts = [];
                             contactBloc.loadContact(pageNumber: 1);
                           },
                           child: Text("Retry"))
