@@ -123,12 +123,11 @@ class _ContactListViewState extends State<ContactListView> {
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                           child: CircleAvatar(
                             radius: 20,
-                            child: contact.avatarUrl == ""
-                                ? Image.asset(
+                            backgroundImage: contact.avatarUrl == ""
+                                ? AssetImage(
                                     AssetPath.defaultAvatar,
-                                    fit: BoxFit.fill,
                                   )
-                                : Image.network(contact.avatarUrl),
+                                : NetworkImage(contact.avatarUrl),
                           ),
                         ),
                         title: Text(contact.name),
