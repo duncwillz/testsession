@@ -46,7 +46,9 @@ class _ContactListViewState extends State<ContactListView> {
                     if (contacts.isNotEmpty &&
                         scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent &&
-                        !contactBloc.loadedAll) {
+                        !contactBloc.loadedAll &&
+                        !contactBloc.isLoadingMore) {
+                      contactBloc.isLoadingMore = true;
                       contactBloc.loadContact(
                           pageNumber: ++contactBloc.initialPageNumber);
                     }
@@ -59,6 +61,7 @@ class _ContactListViewState extends State<ContactListView> {
                       builder: (context, state) {
                         if (state is ContactsLoaded) {
                           contacts = state.contacts;
+                          contactBloc.isLoadingMore = false;
                         }
                         return content(state: state);
                       })),

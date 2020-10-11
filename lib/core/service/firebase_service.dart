@@ -5,6 +5,7 @@ import 'package:flutter_app_sample/util/string_types.dart';
 
 abstract class FirebaseService {
   bool loadedAll = false;
+  bool canLoadMore = false;
   Future getContacts(int fetchLimit, int pageNumber);
 }
 

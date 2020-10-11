@@ -15,6 +15,8 @@ class ContactBloc extends Bloc<ContactEvent, ContactsState> {
   final int fetchLimit = 10;
   int initialPageNumber = 1;
 
+  bool isLoadingMore = false;
+
   ContactBloc({this.firebaseService});
 
   void loadContact({int pageNumber}) {
