@@ -56,51 +56,54 @@ class _ContactsBlocListViewState extends State<ContactsBlocListView> {
                     }
                     return true;
                   },
-                  child: ListView.separated(
-                    itemCount: snapshot.data.length + 1,
-                    itemBuilder: (context, itemIndex) {
-                      if (itemIndex == snapshot.data.length) {
-                        if (contactsOldBloc.loadedAll) {
-                          return Padding(
-                              padding: EdgeInsets.only(bottom: 20, top: 20),
-                              child: FlutterLogo(
-                                size: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ListView.separated(
+                      itemCount: snapshot.data.length + 1,
+                      itemBuilder: (context, itemIndex) {
+                        if (itemIndex == snapshot.data.length) {
+                          if (contactsOldBloc.loadedAll) {
+                            return Padding(
+                                padding: EdgeInsets.only(bottom: 20, top: 20),
+                                child: FlutterLogo(
+                                  size: 50,
+                                ));
+                          }
+                          return Container();
+                        } else if (itemIndex < snapshot.data.length) {
+                          ContactsModel contact = snapshot.data[itemIndex];
+                          return ListTile(
+                              leading: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                child: CircleAvatar(
+                                  radius: 20,
+                                  backgroundImage: contact.avatarUrl == ""
+                                      ? AssetImage(
+                                          AssetPath.defaultAvatar,
+                                        )
+                                      : NetworkImage(contact.avatarUrl),
+                                ),
+                              ),
+                              title: Text(
+                                contact.name,
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: Text(
+                                contact.email,
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w400),
                               ));
                         }
                         return Container();
-                      } else if (itemIndex < snapshot.data.length) {
-                        ContactsModel contact = snapshot.data[itemIndex];
-                        return ListTile(
-                            leading: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundImage: contact.avatarUrl == ""
-                                    ? AssetImage(
-                                        AssetPath.defaultAvatar,
-                                      )
-                                    : NetworkImage(contact.avatarUrl),
-                              ),
-                            ),
-                            title: Text(
-                              contact.name,
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w500),
-                            ),
-                            subtitle: Text(
-                              contact.email,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w400),
-                            ));
-                      }
-                      return Container();
-                    },
-                    separatorBuilder: (context, itemIndex) {
-                      return Divider(
-                        height: 1,
-                      );
-                    },
+                      },
+                      separatorBuilder: (context, itemIndex) {
+                        return Divider(
+                          height: 1,
+                        );
+                      },
+                    ),
                   ),
                 ));
               }
