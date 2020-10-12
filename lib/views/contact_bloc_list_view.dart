@@ -72,29 +72,7 @@ class _ContactsBlocListViewState extends State<ContactsBlocListView> {
                           return Container();
                         } else if (itemIndex < snapshot.data.length) {
                           ContactsModel contact = snapshot.data[itemIndex];
-                          return ListTile(
-                              leading: ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
-                                child: CircleAvatar(
-                                  radius: 20,
-                                  backgroundImage: contact.avatarUrl == ""
-                                      ? AssetImage(
-                                          AssetPath.defaultAvatar,
-                                        )
-                                      : NetworkImage(contact.avatarUrl),
-                                ),
-                              ),
-                              title: Text(
-                                contact.name,
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w500),
-                              ),
-                              subtitle: Text(
-                                contact.email,
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.w400),
-                              ));
+                          return contactListTile(contact);
                         }
                         return Container();
                       },
@@ -133,5 +111,29 @@ class _ContactsBlocListViewState extends State<ContactsBlocListView> {
         ],
       ),
     );
+  }
+
+  /// Render the contact list tile with [contact] object
+  Widget contactListTile(ContactsModel contact) {
+    return ListTile(
+        leading: ClipRRect(
+          borderRadius: BorderRadius.all(Radius.circular(30)),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundImage: contact.avatarUrl == ""
+                ? AssetImage(
+                    AssetPath.defaultAvatar,
+                  )
+                : NetworkImage(contact.avatarUrl),
+          ),
+        ),
+        title: Text(
+          contact.name,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+        ),
+        subtitle: Text(
+          contact.email,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+        ));
   }
 }
