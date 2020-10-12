@@ -21,13 +21,11 @@ class ContactsOldBloc extends Bloc {
 
   ContactsOldBloc({this.firebaseService});
 
-
   List<ContactsModel> contacts = [];
 
   final _contactsController = StreamController<List<ContactsModel>>();
 
   Stream<List<ContactsModel>> get contactsStream => _contactsController.stream;
-
 
   getContacts({int pageNumber}) async {
     contacts = await firebaseService.getContacts(
