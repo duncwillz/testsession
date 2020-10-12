@@ -42,6 +42,7 @@ class ContactsOldBloc extends Bloc {
   @override
   void dispose() {
     _contactsController.close();
+    super.dispose();
   }
 }
 
