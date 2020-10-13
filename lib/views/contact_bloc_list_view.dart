@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_sample/bloc/contacts_bloc.dart';
 import 'package:flutter_app_sample/bloc/contacts_old_bloc.dart';
 import 'package:flutter_app_sample/di/dependencies_injector.dart';
 import 'package:flutter_app_sample/model/contact_model.dart';
@@ -117,13 +118,10 @@ class _ContactsBlocListViewState extends State<ContactsBlocListView> {
   /// Render the contact list tile with [contact] object
   Widget contactListTile(ContactsModel contact) {
     return StreamBuilder(
-      stream: Firestore.instance
-          .collection(StringType.collectionName)
-          .document(contact.id)
-          .snapshots(),
+      stream: contactsOldBloc.subscribeToContact(contact.id),
       builder: (context, AsyncSnapshot snapShot) {
         if (!snapShot.hasData) return SizedBox();
-        ContactsModel contact = ContactsModel.fromJson(snapShot.data.data);
+        ContactsModel contact = contactsOldBloc.getContact(snapShot.data);
         return ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(30)),

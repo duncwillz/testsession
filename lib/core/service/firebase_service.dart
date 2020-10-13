@@ -5,6 +5,7 @@ import 'package:flutter_app_sample/util/string_types.dart';
 
 abstract class FirebaseService {
   bool loadedAll = false;
+  Stream<DocumentSnapshot> subscribeDocument(id);
   Future getContacts(int fetchLimit, int pageNumber);
 }
 
@@ -59,8 +60,16 @@ class FirebaseServiceImpl extends FirebaseService {
 
       // Cache data. Bloc reads directly from cache, passes this to UI
       cacheData.addAll(mapData);
-//      subscribeToNewEvent(fetchLimit);
     });
+  }
+
+  /// Subscribe to document with it's [id]
+  @override
+  Stream<DocumentSnapshot> subscribeDocument(id) {
+    return Firestore.instance
+        .collection(StringType.collectionName)
+        .document(id)
+        .snapshots();
   }
 }
 

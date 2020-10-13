@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_app_sample/core/persistance/local_cache.dart';
 import 'package:flutter_app_sample/core/service/firebase_service.dart';
@@ -32,6 +33,14 @@ class ContactsOldBloc extends Bloc {
         fetchLimit, pageNumber ?? initialPageNumber);
     _contactsController.sink.add(cacheData.values.toList());
     notifyLoadingMore(state: false);
+  }
+
+  Stream<DocumentSnapshot> subscribeToContact(String id) {
+    return firebaseService.subscribeDocument(id);
+  }
+
+  ContactsModel getContact(DocumentSnapshot snapShot) {
+    return ContactsModel.fromJson(snapShot.data);
   }
 
   notifyLoadingMore({bool state}) {
