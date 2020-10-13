@@ -22,14 +22,14 @@ class FirebaseServiceImpl extends FirebaseService {
         if (pageNumber == 1) {
           querySnapshot = await Firestore.instance
               .collection(StringType.collectionName)
-              .orderBy(StringType.fieldName)
+              .orderBy(StringType.fieldName, descending: false)
               .limit(fetchLimit)
               .getDocuments();
           lastDocument = querySnapshot.documents.last;
         } else {
           querySnapshot = await Firestore.instance
               .collection(StringType.collectionName)
-              .orderBy(StringType.fieldName)
+              .orderBy(StringType.fieldName, descending: false)
               .startAfterDocument(lastDocument)
               .limit(fetchLimit)
               .getDocuments();
@@ -38,8 +38,11 @@ class FirebaseServiceImpl extends FirebaseService {
           }
         }
         if (querySnapshot != null && querySnapshot.documents.isNotEmpty) {
-          querySnapshot.documents
-              .forEach((doc) => contacts.add(ContactsModel.fromJson(doc.data)));
+          querySnapshot.documents.forEach((doc) {
+            final contact = ContactsModel.fromJson(doc.data);
+            contact.id = doc.documentID;
+            contacts.add(contact);
+          });
         }
       } catch (e) {
         throw ServiceException(exceptionMessage: e);
@@ -56,6 +59,7 @@ class FirebaseServiceImpl extends FirebaseService {
 
       // Cache data. Bloc reads directly from cache, passes this to UI
       cacheData.addAll(mapData);
+//      subscribeToNewEvent(fetchLimit);
     });
   }
 }

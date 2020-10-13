@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_sample/bloc/contacts_old_bloc.dart';
 import 'package:flutter_app_sample/di/dependencies_injector.dart';
@@ -115,25 +116,35 @@ class _ContactsBlocListViewState extends State<ContactsBlocListView> {
 
   /// Render the contact list tile with [contact] object
   Widget contactListTile(ContactsModel contact) {
-    return ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(30)),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: contact.avatarUrl == ""
-                ? AssetImage(
-                    AssetPath.defaultAvatar,
-                  )
-                : NetworkImage(contact.avatarUrl),
-          ),
-        ),
-        title: Text(
-          contact.name,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        subtitle: Text(
-          contact.email,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
-        ));
+    return StreamBuilder(
+      stream: Firestore.instance
+          .collection(StringType.collectionName)
+          .document(contact.id)
+          .snapshots(),
+      builder: (context, AsyncSnapshot snapShot) {
+        if (!snapShot.hasData) return SizedBox();
+        ContactsModel contact = ContactsModel.fromJson(snapShot.data.data);
+        return ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(30)),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: contact.avatarUrl == ""
+                    ? AssetImage(
+                        AssetPath.defaultAvatar,
+                      )
+                    : NetworkImage(contact.avatarUrl),
+              ),
+            ),
+            title: Text(
+              contact.name,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            ),
+            subtitle: Text(
+              contact.email,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+            ));
+      },
+    );
   }
 }
